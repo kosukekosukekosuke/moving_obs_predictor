@@ -1,0 +1,2 @@
+PREDICT_TIME: 3.0  # total time to make a prediction [sec]
+DT: 0.1            # width for PREDICT_TIME [sec], Match dwa_planner's DT 
