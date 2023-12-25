@@ -134,32 +134,35 @@ class ConstantVelocityPredictor:
                 #     print("Does not calculate actors velocity")
 
                 obs_lists = PredictedActor()
+                obs_lists.header.frame_id = "map"
+                obs_lists.header.stamp = rospy.Time.now()
                 obs_lists.name = self.actors.name
                 split = int(self.PREDICT_TIME / self.DT)
-                for i in range(split):
-                    obs_list = Marker()
-                    obs_list.header.frame_id ="map"
-                    obs_list.header.stamp = rospy.Time.now()
-                    obs_list.color.r = 0
-                    obs_list.color.g = 0.5
-                    obs_list.color.b = 1
-                    obs_list.color.a = 1 - i / split  # become light 
-                    # obs_list.color.a = (i + 1) / split  # become deep 
-                    obs_list.ns = "ros_gym_sfm/prediction"
-                    obs_list.id = i
-                    obs_list.type = Marker.SPHERE_LIST
-                    obs_list.action = Marker.ADD
-                    obs_list.lifetime = rospy.Duration()
-                    obs_list.scale.x = self.radius
-                    obs_list.scale.y = self.radius
-                    obs_list.scale.z = self.radius
-                    pose = Pose()
-                    pose.orientation.w = 1
-                    obs_list.pose = pose
-                    obs_list_t = Marker()
-                    obs_list_t = self.predict_obs(self.actors.pose, actors_vel.pose, i)
-                    obs_list.points = obs_list_t.points
-                    obs_lists.timepose.markers.append(obs_list)
+                if len(self.actors.pose.points) > 0 and len(actors_vel.pose.points) > 0:
+                    for i in range(split):
+                        obs_list = Marker()
+                        obs_list.header.frame_id = "map"
+                        obs_list.header.stamp = rospy.Time.now()
+                        obs_list.color.r = 0
+                        obs_list.color.g = 0.5
+                        obs_list.color.b = 1
+                        obs_list.color.a = 1 - i / split  # become light 
+                        # obs_list.color.a = (i + 1) / split  # become deep 
+                        obs_list.ns = "ros_gym_sfm/prediction"
+                        obs_list.id = i
+                        obs_list.type = Marker.SPHERE_LIST
+                        obs_list.action = Marker.ADD
+                        obs_list.lifetime = rospy.Duration()
+                        obs_list.scale.x = self.radius
+                        obs_list.scale.y = self.radius
+                        obs_list.scale.z = self.radius
+                        pose = Pose()
+                        pose.orientation.w = 1
+                        obs_list.pose = pose
+                        obs_list_t = Marker()
+                        obs_list_t = self.predict_obs(self.actors.pose, actors_vel.pose, i)
+                        obs_list.points = obs_list_t.points
+                        obs_lists.timepose.markers.append(obs_list)
                 self.moving_obs_pub.publish(obs_lists)
                 self.moving_obs_debug_pub.publish(obs_lists.timepose)
 
